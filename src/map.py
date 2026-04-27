@@ -1,14 +1,3 @@
-###########################################################################################
-#                                                                                         #
-#                                                                                         #
-#     This file is cited and modified from:                                               #
-#     * Github repository: Multi-Purpose MPC                                              #
-#     * Author: matssteinweg, ZTH                                                         #
-#     We don't own the file. All rights reserved to the original author                   #
-#     for more details please check https://github.com/matssteinweg/Multi-Purpose-MPC     #
-#                                                                                         #
-#                                                                                         #
-###########################################################################################
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.morphology import remove_small_holes
