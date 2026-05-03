@@ -9,7 +9,7 @@ from casadi.tools import *
 
 from reference_path import ReferencePath
 from map import Map, Obstacle
-from model import simple_bycicle_model
+from model import rosbot
 from simulator import Simulator
 from MPC import MPC
 
@@ -65,14 +65,12 @@ def MPC_Problem_setup(reference_path, ay_max=4.0, a_min=-1, a_max=1, use_obstacl
     Get configured do-mpc modules:
     '''
     # model setup
-    Vehicle = simple_bycicle_model(
+    Vehicle = rosbot(
         length=0.12, width=0.06, reference_path=reference_path, Ts=0.05
     )
     Vehicle.model_setup()
 
     Controller = MPC(Vehicle, use_obstacles)
-
-    Sim = Simulator(Vehicle)
 
     # Compute speed profile
     SpeedProfileConstraints = {
@@ -84,15 +82,13 @@ def MPC_Problem_setup(reference_path, ay_max=4.0, a_min=-1, a_max=1, use_obstacl
     }
     Vehicle.reference_path.compute_speed_profile(SpeedProfileConstraints)
 
-    return Vehicle, Controller, Sim
+    return Vehicle, Controller
 
 
 if __name__ == '__main__':
 
     ''' User settings: '''
-    show_animation = False
-    store_results = False
-    use_obstacles = False
+    use_obstacles = True
 
     map_file = 'maps/sim_map.png'
 
@@ -100,7 +96,7 @@ if __name__ == '__main__':
     reference_path = environment_setup(map_file, use_obstacles=use_obstacles)
 
     # initiate the class of mpc, simulator
-    Vehicle, Controller, Sim = MPC_Problem_setup(reference_path, use_obstacles=use_obstacles)
+    Vehicle, Controller = MPC_Problem_setup(reference_path, use_obstacles=use_obstacles)
 
     '''
     Set initial state
@@ -108,7 +104,6 @@ if __name__ == '__main__':
     x0 = np.array([Vehicle.reference_path.waypoints[0].x, Vehicle.reference_path.waypoints[0].y,
                    Vehicle.reference_path.waypoints[0].psi, 0.3, 0])
     Controller.mpc.x0 = x0
-    Sim.simulator.x0 = x0
 
     # Use initial state to set the initial guess.
     Controller.mpc.set_initial_guess()
@@ -122,21 +117,18 @@ if __name__ == '__main__':
         # Get control signals
         u = Controller.get_control(x0)
 
-        # Simulate car
-        x0 = Sim.simulator.make_step(u)
+        # Next state
+        x0 = None
         Controller.distance_update(x0)
 
         # Plot path and drivable area/ plot car
         pred_x = Controller.mpc.data.prediction(('_x', 'pos_x'), t_ind=t)[0]
         pred_y = Controller.mpc.data.prediction(('_x', 'pos_y'), t_ind=t)[0]
         reference_path.show(pred_x, pred_y)
-        Sim.show(x0)
 
         # update boundary for the next iteration
         Controller.constraints_setup()
 
         t += 1
-        plt.axis('off')
-        plt.pause(0.001)
 
     input('Press any key to exit.')

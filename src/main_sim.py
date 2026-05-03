@@ -9,7 +9,7 @@ from casadi.tools import *
 
 from reference_path import ReferencePath
 from map import Map, Obstacle
-from model import simple_bycicle_model
+from model import rosbot
 from simulator import Simulator
 from MPC import MPC
 
@@ -65,7 +65,7 @@ def MPC_Problem_setup(reference_path, ay_max=4.0, a_min=-1, a_max=1, use_obstacl
     Get configured do-mpc modules:
     '''
     # model setup
-    Vehicle = simple_bycicle_model(
+    Vehicle = rosbot(
         length=0.12, width=0.06, reference_path=reference_path, Ts=0.05
     )
     Vehicle.model_setup()

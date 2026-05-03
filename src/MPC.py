@@ -37,7 +37,7 @@ class MPC:
         }
         self.mpc.set_param(**setup_mpc)
 
-        # define the objective function and constriants
+        # define the objective function and constraints
         self.objective_function_setup()
         self.constraints_setup()
 

@@ -14,7 +14,7 @@ from reference_path import ReferencePath
 sys.path.append("../../")
 
 
-class simple_bycicle_model:
+class rosbot:
     def __init__(self, reference_path, length, width, Ts):
 
         # car paramters
